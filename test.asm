@@ -13,7 +13,7 @@ min EQU 0
 
 ;Setup
 ;MOV R8,2 ;Page
-MOV R8,0
+MOV R8,1
 MOV R2,0b0001 ;Direction
 MOV R1,min ;Location
 MOV R3,min ; last location
@@ -26,6 +26,14 @@ MOV [0xF1],R0
 MOV R4,0b0100
 MOV R5,0b0010
 MOV R6,0b1110
+MOV R0,R4
+MOV [25],R0
+MOV R0,R5
+MOV [26],R0
+MOV R0,R6
+MOV [27],R0
+
+; note on page 1 starts at 16 and the last row should be 31
 
 main:
 GOTO main
