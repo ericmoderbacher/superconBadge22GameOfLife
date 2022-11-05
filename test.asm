@@ -36,6 +36,12 @@ MOV [27],R0
 ; note on page 1 starts at 16 and the last row should be 31
 
 main:
+;MOV R9,16
+MOV R3, 0b0001
+MOV R4, 0b0000
+MOV R0,[25]
+BTG R0, 3
+MOV [25],R0
 GOTO main
 
 oldMain:
@@ -75,3 +81,5 @@ MOV [R8:R3],R0 ; draw line across pages
 DEC R8
 
 RET R0,0000+5-1+3-7
+
+
