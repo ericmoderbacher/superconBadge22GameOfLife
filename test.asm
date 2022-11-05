@@ -33,15 +33,36 @@ MOV [26],R0
 MOV R0,R6
 MOV [27],R0
 
+MOV R3, 0b0001 ;first half of the number 16 00010000
+MOV R4, 0b0000 ;second half
+
 ; note on page 1 starts at 16 and the last row should be 31
 
 main:
-;MOV R9,16
-MOV R3, 0b0001
-MOV R4, 0b0000
-MOV R0,[25]
-BTG R0, 3
-MOV [25],R0
+;MOV R0,[0xF4] ;hopefullyreads from V flag
+MOV R3, 0b0001 ;first half of the number 16 00010000
+MOV R4, 0b0000 ;second half
+mainSkipingSetup:
+MOV R0,[R3:R4]
+BTG R0, 3 ;toggles the 4th bit
+;BIT RO, 3 ;check new state of that bit sets v flag
+MOV [R3:R4],R0
+INC R4 ;if result is 0000 then sets z and c
+;00 c
+;01 nc
+;10 z
+;11 nz
+
+;00 4
+;01 1
+;10 2
+;11 3
+;SKIP 0B1101  ;if not z 11 then skip forward 1
+SKIP NZ,0b10
+INC R3
+SKIP NZ,0b01
+GOTO mainSkipingSetup
+
 GOTO main
 
 oldMain:
