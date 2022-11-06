@@ -51,27 +51,27 @@ MOV R0,6
 MOV [0xF1],R0
 
 ; R3 and R4 are used to keep track of the outermost loop
-MOV R3, 0b0001 ;first half of the number 16 00010000
-MOV R4, 0b0000 ;second half
+MOV R1, 0b0001 ;first half of the number 16 00010000
+MOV R2, 0b0000 ;second half
 
 main:
 ;MOV R0,[0xF4] ;hopefullyreads from V flag
-MOV R3, 0b0001 ;first half of the number 16 00010000
-MOV R4, 0b0000 ;second half
+MOV R1, 0b0001 ;first half of the number 16 00010000
+MOV R2, 0b0000 ;second half
 mainSkipingSetup:
-MOV R0,[R3:R4] ;moves the value at 8bit address to R0
+MOV R0,[R1:R2] ;moves the value at 8bit address to R0
 BTG R0, 0 ;toggles the 1th bit
 BTG R0, 1 ;toggles the 4th bit
 BTG R0, 2 ;toggles the 4th bit
 BTG R0, 3 ;toggles the 4th bit
 
 ;BIT RO, 3 ;check new state of that bit sets v flag
-MOV [R3:R4],R0
-INC R4 ;if result is 0000 then sets z and c
+MOV [R1:R2],R0
+INC R2 ;if result is 0000 then sets z and c
 SKIP NZ, 1
-INC R3
-MOV R2, R3
-BIT R2,1
+INC R1
+MOV R0, R1
+BIT R0,1
 SKIP NZ, 1
-MOV R3, 0b0001
+MOV R1, 0b0001
 GOTO mainSkipingSetup
