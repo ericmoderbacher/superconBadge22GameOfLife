@@ -7,7 +7,7 @@
 ;r5 is col of the current cell we are working
 ;r6 is the current neighbor row offset index
 ;r7 is the current neighbor col offset index
-
+;r8 is current alive status
 ;r9 is the neighbor count
 
 ;012
@@ -35,7 +35,7 @@ MOV [0xF0],R0   ;esm the bracket seems to be a literal
 MOV R0,6
 MOV [0xF1],R0
 
-
+main:
 MOV R4, 0b0000 ;set row index to zero
 MOV R5, 0b0000 ;set col index to zero
 MOV R6, 0b0000 ;set the neighbor index to zero
@@ -44,12 +44,14 @@ MOV R6, 0b0000 ;set the neighbor index to zero
 RowLoop:
 ColLoop:
 GOSUB setPointerToCurrentCell
-GOSUB theCellFunction ;todo implement this which sets the output cell!
+GOSUB getValueOfCell
+MOV R8,R0 ;set R8 to the status of the current cell
 NeighborRowLoop:
 NeighborColLoop:
 
 GOSUB setPointerToCurrentNeighbor ;sets r1,r2,r3 which are needed for cell interaction functions
-GOSUB NeighborAccumulate ;assumes r1,r2 and r3 are primed for neighbor checking
+GOSUB getValueOfCell ;assumes r1,r2 and r3 are primed for neighbor checking
+ADD R9,R0 //adds current neighbor status to accumulation
 
 INC R7 ;neighbor col index
 
@@ -149,14 +151,39 @@ RET R0,0
 ;checks if cell is alive and the accumulation values then decides its fate
 theCellFunction:
 
-;todo move parrent overload here
+;checks if the current location is dead
+getValueOfCell:
+MOV R0,R3
+
+CP R0,0 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO getValueOfCellzero
+
+CP R0,1 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO getValueOfCellOne
+
+CP R0,2 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO getValueOfCellTWO
+
+CP R0,3 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO getValueOfCellThree
+
+haveValue:
+//next 4 lines is just to return the value of r0
+CP RO,1
+SKIP NZ, 1
+RET R0,1
+RET R0,0
 ;expects r0 to have nible to be checked in it
 getValueOfCellzero:
 MOV R0, [R1:R2] ;get the current nibble
 BIT R0,0 ;if tested bit is 0 then set z flag
 SKIP Z,1
 RET R0,0
-ret R0,1
+RET R0,1
 getValueOfCellone:
 MOV R0, [R1:R2] ;get the current nibble
 BIT R0,1 ;if tested bit is 0 then set z flag
@@ -176,7 +203,25 @@ SKIP Z,1
 RET R0,0
 RET R0,1
 
-;todo put parrent overload here
+killCell:
+MOV R0,R3
+
+CP R0,0 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO killCellzero
+
+CP R0,1 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO killCellOne
+
+CP R0,2 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO killCellTWO
+
+CP R0,3 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO killCellThree
+
 killCellzero:
 MOV R0, [R1:R2] ;get the current nibble
 BCLR R0,0 ;if tested bit is 0 then set z flag
@@ -198,7 +243,25 @@ BCLR R0,3 ;if tested bit is 0 then set z flag
 MOV [R1:R2],R0
 RET R0,1
 
-;todo put parrent overload here
+unkillCell:
+MOV R0,R3
+
+CP R0,0 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO unkillCellzero
+
+CP R0,1 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO unkillCellOne
+
+CP R0,2 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO unkillCellTWO
+
+CP R0,3 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO unkillCellThree
+
 unkillCellzero:
 MOV R0, [R1:R2] ;get the current nibble
 BCLR R0,0 ;if tested bit is 0 then set z flag
@@ -220,22 +283,7 @@ BCLR R0,3 ;if tested bit is 0 then set z flag
 MOV [R1:R2],R0
 RET R0,1
 
-;checks if the current location is dead
-getValueOfCell:
-MOV R0,R3
-CP R0,0 ;if r0 == n then set z flag
-SKIP NZ,0 ;todo change from 0 to the correct value
-GOSUB getValueOfCellone
-CP R0,0 ;if r0 == n then set z flag
-SKIP NZ,0 ;todo change from 0 to the correct value
-GOTO isDeadRet
 
-
-;CP R0 ;;esm todo complete
-
-isdeadRet:
-RET R0,1
-RET R0,0
 
 
 
