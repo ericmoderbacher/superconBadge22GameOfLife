@@ -1,11 +1,14 @@
+;http://cloud.wd5gnr.com/badgeasm/
 ;What each register is for:
 ;r0 reserved for working
 ;r1 and 2 are the pointer to the nible im currently working on in the functions that do stuff with nibbles
 ;r3 is the bit number of the bit im working on in that nibble for functions
 ;r4 is row of current cell we are working
 ;r5 is col of the current cell we are working
-;r6 is the current neighbor index
-;r7 is the neighbor count
+;r6 is the current neighbor row offset index
+;r7 is the current neighbor col offset index
+
+;r9 is the neighbor count
 
 ;012
 ;345
@@ -42,28 +45,47 @@ RowLoop:
 ColLoop:
 GOSUB setPointerToCurrentCell
 GOSUB theCellFunction ;todo implement this which sets the output cell!
-NeighborIDLoop:
+NeighborRowLoop:
+NeighborColLoop:
 
 GOSUB setPointerToCurrentNeighbor ;sets r1,r2,r3 which are needed for cell interaction functions
 GOSUB NeighborAccumulate ;assumes r1,r2 and r3 are primed for neighbor checking
 
-INC R6 ;neighbor index
+INC R7 ;neighbor col index
 
-;if neighbor index is 4 we need to inc again BEGIN
+;if neighbor col index is 1 we need to inc again BEGIN
+MOV R0, R7
+CP R0, 1 ;if 1 we want to skip again
+SKIP NZ,1
+INC R7
+;if neighbor col index is 1 we need to inc again END
+
+;if neighbor col index is 3 we can continue BEGIN
+;MOV R0, R6 ;redundant removed
+CP R0, 3 ;if 4 sets z
+SKIP NZ,2 ;if neighbor index is 9 now we end this loop otherwise loop
+MOV R7, 0 ;reset neighbor col index
+GOTO NeighborColLoopEND ;basically 'skip 1 more'
+GOTO NeighborColLoop
+NeighborColLoopEND:
+
+INC R6 ;neighbor row index
+
+;if neighbor row index is 1 we need to inc again BEGIN
 MOV R0, R6
-CP R0, 4 ;if 4 sets z
+CP R0, 1 ;if 1 we want to skip again
 SKIP NZ,1
 INC R6
-;if neighbor index is 4 we need to inc again END
+;if neighbor row index is 1 we need to inc again END
 
-;if neighbor index is 9 we can continue BEGIN
+;if neighbor row index is 3 we can continue BEGIN
 ;MOV R0, R6 ;redundant removed
-CP R0, 9 ;if 4 sets z
+CP R0, 3 ;if 4 sets z
 SKIP NZ,2 ;if neighbor index is 9 now we end this loop otherwise loop
-MOV R6, 0 ;reset neighbor index
-GOTO NeighborIDLoopEND ;basically 'skip 1 more'
-GOTO NeighborIDLoop
-NeighborIDLoopEND:
+MOV R6, 0 ;reset neighbor row index
+GOTO NeighborRowLoopEND ;basically 'skip 1 more'
+GOTO NeighborRowLoop
+NeighborRowLoopEND:
 
 INC R5 ;col index
 
@@ -89,31 +111,37 @@ GOTO RowLoop ;where i would go to the other one
 ;FUNCTIONS BEGIN:
 setPointerToCurrentCell:
 ;using R4 (current row), R5 (Current Col) populate R1:R2(nibble address) and R3 Bit ID
+MOV R2,R4 ;R4 is alread identical to what R2 needs to be
+
+MOV R0,R5
+CP R0,4 ;if R5 (current col) is less than or equal to 4 then R1 is 0000 otherwise 0001
+MOV R1,0b0000
+SKIP NC
+MOV R1,0b0001
+
+SUB R0,4 ;subtrack 4 from r0 which is still set to R5
+MOV R3,R0 //That should be right todo validate
+
 RET R0,1
 
 
-setWorkingPointerToCurrentNeighbor:
-;using R4 (current row), R5 (Current Col) populate R1:R2(nibble address) and R3 Bit ID
-;but this time also using R6 (neighbor id)
-
-RET R0,1
-
-
-;this function sets r1 and r2 to the nibble of the current neighbor
-;it also sets r3 to the bit number of the current neighbor
-;after this function has ran the cell interaction functions will operate on the current neighbor
 setPointerToCurrentNeighbor:
+;using R4 (current row), R5 (Current Col) populate R1:R2(nibble address) and R3 Bit ID
+;but this time also using R6 (neighbor row id) and R7 (neighbor col id)
+MOV R1,R6
+Mov R2,R7
 
-RET R0,0
+ADD R1,R4
+ADD R2,R5
+
+
+RET R0,1
 
 ;this function assumes that setPointerToCurrentNeighbor has just ran
 ;which means r1 r2 and r3 are ready and pointing at the neighbor
 NeighborAccumulate:
 
 RET R0,0
-
-
-
 
 
 
