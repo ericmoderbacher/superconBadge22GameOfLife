@@ -43,14 +43,14 @@ MOV R6, 0b0000 ;set the neighbor index to zero
 ;outermost loop basically main
 RowLoop:
 ColLoop:
-GOSUB setPointerToCurrentCell
-GOSUB getValueOfCell
+;GOSUB setPointerToCurrentCell
+;;GOSUB getValueOfCell
 MOV R8,R0 ;set R8 to the status of the current cell
 NeighborRowLoop:
 NeighborColLoop:
 
-GOSUB setPointerToCurrentNeighbor ;sets r1,r2,r3 which are needed for cell interaction functions
-GOSUB getValueOfCell ;assumes r1,r2 and r3 are primed for neighbor checking
+;GOSUB setPointerToCurrentNeighbor ;sets r1,r2,r3 which are needed for cell interaction functions
+;GOSUB getValueOfCell ;assumes r1,r2 and r3 are primed for neighbor checking
 ADD R9,R0 ;adds current neighbor status to accumulation
 
 INC R7 ;neighbor col index
@@ -65,7 +65,7 @@ INC R7
 ;if neighbor col index is 3 we can continue BEGIN
 ;MOV R0, R6 ;redundant removed
 CP R0, 3 ;if 4 sets z
-SKIP NZ,2 ;if neighbor index is 9 now we end this loop otherwise loop
+SKIP NZ,2 ;if neighbor index is 3 now we end this loop otherwise loop
 MOV R7, 0 ;reset neighbor col index
 GOTO NeighborColLoopEND ;basically 'skip 1 more'
 GOTO NeighborColLoop
@@ -107,7 +107,7 @@ MOV R4,0 ;reset col index
 GOTO RowLoopEND ;basically 'skip 1 more'
 GOTO RowLoop ;end of main control loop
 RowLoopEND:
-GOTO RowLoop ;where i would go to the other one
+GOTO main ;where i would go to the other one
 
 
 ;FUNCTIONS BEGIN:
@@ -138,13 +138,23 @@ ADD R1,R4
 ADD R2,R5
 
 
+;ADD R1,7
+;ADD R2,7 ;modular math i think so at this point r1 is pointed to
+MOV R0,R1
+ADD R0,7
+MOV R1,R0
+
+MOV R0,R2
+ADD R0,7
+MOV R2,R0
+
+
+MOV R0,R7
+ADD R0,4 ;subtract 4 from r0 which
+ADD R0,8 ;thats like subtracting right?
+MOV R3,R0 ;That should be right todo validate
+
 RET R0,1
-
-;this function assumes that setPointerToCurrentNeighbor has just ran
-;which means r1 r2 and r3 are ready and pointing at the neighbor
-NeighborAccumulate:
-
-RET R0,0
 
 
 
@@ -157,19 +167,19 @@ getValueOfCell:
 MOV R0,R3
 
 CP R0,0 ;if r0 == n then set z flag
-SKIP NZ,2 ;todo change from 0 to the correct value
+SKIP NZ,1 ;todo change from 0 to the correct value
 GOTO getValueOfCellzero
 
 CP R0,1 ;if r0 == n then set z flag
-SKIP NZ,2 ;todo change from 0 to the correct value
+SKIP NZ,1 ;todo change from 0 to the correct value
 GOTO getValueOfCellOne
 
 CP R0,2 ;if r0 == n then set z flag
-SKIP NZ,2 ;todo change from 0 to the correct value
+SKIP NZ,1 ;todo change from 0 to the correct value
 GOTO getValueOfCellTWO
 
 CP R0,3 ;if r0 == n then set z flag
-SKIP NZ,2 ;todo change from 0 to the correct value
+SKIP NZ,1 ;todo change from 0 to the correct value
 GOTO getValueOfCellThree
 
 haveValue:
