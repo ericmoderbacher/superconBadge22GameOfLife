@@ -2,10 +2,12 @@
 ;r0 reserved for working
 ;r1 and 2 are the pointer to the nible im currently working on in the functions that do stuff with nibbles
 ;r3 is the bit number of the bit im working on in that nibble for functions
-;r4 and 5 are the pointer i want to hold while r1 and 2 are being used for the neibor address etc
-;r6 is the bit number of the bit im working on in that nibble
-;r7 is the current neighbor id
+;r4 is row of current cell we are working
+;r5 is col of the current cell we are working
+;r6 is the current neighbor row
+;r7 is the current neighbor col
 ;r8 is the neighbor count
+
 
 
 
