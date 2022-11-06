@@ -51,7 +51,7 @@ NeighborColLoop:
 
 GOSUB setPointerToCurrentNeighbor ;sets r1,r2,r3 which are needed for cell interaction functions
 GOSUB getValueOfCell ;assumes r1,r2 and r3 are primed for neighbor checking
-ADD R9,R0 //adds current neighbor status to accumulation
+ADD R9,R0 ;adds current neighbor status to accumulation
 
 INC R7 ;neighbor col index
 
@@ -118,11 +118,12 @@ MOV R2,R4 ;R4 is alread identical to what R2 needs to be
 MOV R0,R5
 CP R0,4 ;if R5 (current col) is less than or equal to 4 then R1 is 0000 otherwise 0001
 MOV R1,0b0000
-SKIP NC
+SKIP NC,1
 MOV R1,0b0001
 
-SUB R0,4 ;subtrack 4 from r0 which is still set to R5
-MOV R3,R0 //That should be right todo validate
+ADD R0,4 ;subtract 4 from r0 which is still set to R5
+ADD R0,8 ;thats like subtracting right?
+MOV R3,R0 ;That should be right todo validate
 
 RET R0,1
 
@@ -172,8 +173,8 @@ SKIP NZ,2 ;todo change from 0 to the correct value
 GOTO getValueOfCellThree
 
 haveValue:
-//next 4 lines is just to return the value of r0
-CP RO,1
+;next 4 lines is just to return the value of r0
+CP R0,1
 SKIP NZ, 1
 RET R0,1
 RET R0,0
@@ -283,6 +284,46 @@ BCLR R0,3 ;if tested bit is 0 then set z flag
 MOV [R1:R2],R0
 RET R0,1
 
+
+toggleCell:
+MOV R0,R3
+
+CP R0,0 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO toggleCellzero
+
+CP R0,1 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO toggleCellOne
+
+CP R0,2 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO toggleCellTWO
+
+CP R0,3 ;if r0 == n then set z flag
+SKIP NZ,2 ;todo change from 0 to the correct value
+GOTO toggleCellThree
+
+toggleCellzero:
+MOV R0, [R1:R2] ;get the current nibble
+BTG R0,0 ;if tested bit is 0 then set z flag
+MOV [R1:R2],R0
+RET R0,1
+toggleCellone:
+MOV R0, [R1:R2] ;get the current nibble
+BTG R0,1 ;if tested bit is 0 then set z flag
+MOV [R1:R2],R0
+RET R0,1
+toggleCelltwo:
+MOV R0, [R1:R2] ;get the current nibble
+BTG R0,2 ;if tested bit is 0 then set z flag
+MOV [R1:R2],R0
+RET R0,1
+toggleCellthree:
+MOV R0, [R1:R2] ;get the current nibble
+BTG R0,3 ;if tested bit is 0 then set z flag
+MOV [R1:R2],R0
+RET R0,1
 
 
 
